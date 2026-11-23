@@ -120,6 +120,19 @@
   .tcard{position:relative}
   .attribution{font-size:11px;color:#8f84a8;text-align:center;margin-top:8px}
 
+
+  .spread-deck{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:14px 0 6px;perspective:900px}
+  .mini-card{width:74px;height:112px;border-radius:10px;background:radial-gradient(circle at 50% 28%,#3b2a6b,#140d2b 72%);border:2px solid #8a6d2b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:transform .25s,border-color .25s,box-shadow .25s,opacity .3s;box-shadow:0 8px 22px rgba(0,0,0,.5);animation:dealIn .45s both;position:relative}
+  .mini-card:hover{transform:translateY(-14px) scale(1.08) rotate(0deg)!important;border-color:#f5d76e;box-shadow:0 0 22px rgba(245,215,110,.65)}
+  .mini-card .m-moon{font-size:24px}
+  .mini-card .m-txt{font-size:8px;letter-spacing:.22em;color:#d4af37}
+  .mini-card.picked{border-color:#f5d76e;box-shadow:0 0 0 3px #f5d76e,0 0 28px rgba(245,215,110,.8);transform:translateY(-12px) scale(1.06)}
+  .mini-card.picked::after{content:'✓';position:absolute;top:-9px;right:-7px;width:24px;height:24px;border-radius:50%;background:#d4af37;color:#1a102e;font-weight:900;display:grid;place-items:center;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+  .mini-card.dim{opacity:.38;pointer-events:none}
+  .pick-progress{text-align:center;font-weight:800;color:#ffe9a8;margin:8px 0 2px;font-size:15px}
+  .pick-progress b{color:#f5d76e;font-size:18px}
+  .fan-hint{text-align:center;color:#b8a9d1;font-size:12px;margin-bottom:6px}
+
 </style>
 </head>
 <body>
@@ -133,7 +146,7 @@
     <div class="steps">
       <div class="step"><div class="n">01</div><p>질문을<br>마음속으로 정하기</p></div>
       <div class="step"><div class="n">02</div><p>스프레드를<br>고르고 셔플하기</p></div>
-      <div class="step"><div class="n">03</div><p>끌리는 카드를<br>직접 뒤집기</p></div>
+      <div class="step"><div class="n">03</div><p>펼쳐진 22장 중<br>끌리는 카드 고르기</p></div>
       <div class="step"><div class="n">04</div><p>깊이 있는 해석을<br>천천히 읽기</p></div>
     </div>
   </header>
@@ -161,11 +174,14 @@
       <div class="spread" data-spread="money" data-count="3"><span class="e">💰</span><b>재물 · 돈</b><small>3장 · 돈의 흐름</small></div>
     </div>
     <button class="shuffle-btn" id="shuffleBtn" onclick="shuffle()">🔮 카드 셔플하기</button>
-    <p class="hint">셔플하면 카드가 섞입니다. 끌리는 카드를 눌러 뒤집어 보세요.</p>
+    <p class="hint">셔플하면 22장이 쫙 펼쳐집니다. 끌리는 카드를 직접 고르세요.</p>
 
     <div class="deck-area" id="deckArea">
       <div class="deck-title" id="deckTitle">카드를 선택하세요</div>
-      <div class="deck-sub" id="deckSub">마음이 가는 카드를 순서대로 뒤집으세요. 정방향·역방향은 운명이 정합니다.</div>
+      <div class="deck-sub" id="deckSub">마음이 가는 카드를 순서대로 고르세요. 정방향·역방향은 운명이 정합니다.</div>
+      <div class="pick-progress" id="pickProgress"></div>
+      <div class="fan-hint">✦ 22장 전부 뒷면으로 펼쳐놨어요. 끌리는 카드를 직접 고르세요 ✦</div>
+      <div class="spread-deck" id="spreadDeck"></div>
       <div class="cards" id="cards"></div>
     </div>
 
@@ -246,32 +262,67 @@ function shuffle(){
   document.getElementById('result').classList.remove('show');
   const area=document.getElementById('deckArea');
   area.classList.add('show');
-  // shuffle animation on button
   btn.classList.add('shuffling');
   setTimeout(()=>{
     btn.classList.remove('shuffling'); btn.disabled=false; btn.textContent='🔮 다시 셔플하기';
-    // draw unique cards
-    const pool=[...CARDS].sort(()=>Math.random()-0.5);
-    drawn=pool.slice(0,selectedCount).map(c=>({...c, reversed: Math.random()<0.35}));
-    flipped=0;
+    // 22장 전부 섞어서 뒷면으로 펼치기
+    window._pool=[...CARDS].sort(()=>Math.random()-0.5);
+    window._picked=[]; drawn=[]; flipped=0;
     const titles={today:'오늘 당신에게 온 카드',past:'과거 · 현재 · 미래',love:'사랑의 흐름',career:'커리어의 흐름',money:'재물의 흐름'};
-    document.getElementById('deckTitle').textContent=titles[selectedSpread]+' — 카드를 뒤집어 보세요';
-    lunaSay('섞었어요. 이제 마음이 가는 카드를 눌러 뒤집어 보세요. 끌리는 카드가 당신의 카드예요.');
+    document.getElementById('deckTitle').textContent='✦ 22장을 쫙 펼쳤어요 — '+selectedCount+'장을 고르세요 ✦';
+    lunaSay('22장을 전부 펼쳐놨어요. 끌리는 카드를 '+selectedCount+'장 고르세요. 손이 가는 카드가 당신의 카드예요.');
+    document.getElementById('pickProgress').innerHTML='선택한 카드: <b>0 / '+selectedCount+'</b>';
+    const deck=document.getElementById('spreadDeck'); deck.innerHTML='';
     const wrap=document.getElementById('cards'); wrap.innerHTML='';
-    drawn.forEach((c,i)=>{
-      const d=document.createElement('div'); d.className='tcard'; d.dataset.i=i;
-      d.innerHTML=`<div class="pos">${spreadPos[selectedSpread][i]||''}</div><div class="tcard-inner">
-        <div class="tcard-face tcard-back"><div class="moon-sym">🌙</div><div class="lun">LUNA TAROT</div><div class="pat">✦ ✦ ✦</div></div>
-        <div class="tcard-face tcard-front ${c.reversed?'reversed':''}">
-          <img src="${IMG_BY_NUM[c.n]}" alt="${c.name} - ${c.en}" loading="lazy" onerror="this.outerHTML='<div class=\'sym\'>'+c.sym+'</div>'">
-          <div class="nm">${c.name}</div><div class="en">${c.en} · ${c.reversed?'역방향':'정방향'}</div>
-          <div class="rev ${c.reversed?'r':''}">${c.reversed?'역방향':'정방향'}</div>
-        </div></div>`;
-      d.addEventListener('click',()=>flipCard(d,i));
-      wrap.appendChild(d);
+    window._pool.forEach((c,idx)=>{
+      const m=document.createElement('div'); m.className='mini-card'; m.dataset.idx=idx;
+      const rot=((idx-10.5)/10.5)*10;
+      m.style.setProperty('--r', rot+'deg');
+      m.style.transform='rotate('+rot+'deg)';
+      m.style.animationDelay=(idx*0.04)+'s';
+      m.innerHTML='<div class="m-moon">🌙</div><div class="m-txt">LUNA</div><div class="m-txt">✦ ✦ ✦</div>';
+      m.addEventListener('click',()=>pickMini(m, idx));
+      deck.appendChild(m);
     });
     area.scrollIntoView({behavior:'smooth',block:'center'});
   },900);
+}
+function pickMini(el, idx){
+  if(el.classList.contains('picked')) return;
+  if(window._picked.length>=selectedCount) return;
+  el.classList.add('picked');
+  window._picked.push(window._pool[idx]);
+  document.getElementById('pickProgress').innerHTML='선택한 카드: <b>'+window._picked.length+' / '+selectedCount+'</b>';
+  burst(el);
+  if(window._picked.length<selectedCount){
+    lunaSay('좋아요, '+(window._picked.length)+'장 골랐어요. '+(selectedCount-window._picked.length)+'장 더 고르세요.');
+  } else {
+    lunaSay('다 골랐어요! 이제 카드를 열어드릴게요…');
+    document.querySelectorAll('.mini-card:not(.picked)').forEach(x=>x.classList.add('dim'));
+    setTimeout(revealPicked, 800);
+  }
+}
+function revealPicked(){
+  drawn=window._picked.map(c=>({...c, reversed: Math.random()<0.35}));
+  flipped=0;
+  const wrap=document.getElementById('cards'); wrap.innerHTML='';
+  drawn.forEach((c,i)=>{
+    const d=document.createElement('div'); d.className='tcard'; d.dataset.i=i;
+    d.innerHTML=`<div class="pos">${spreadPos[selectedSpread][i]||''}</div><div class="tcard-inner">
+      <div class="tcard-face tcard-back"><div class="moon-sym">🌙</div><div class="lun">LUNA TAROT</div><div class="pat">✦ ✦ ✦</div></div>
+      <div class="tcard-face tcard-front ${c.reversed?'reversed':''}">
+        <img src="${IMG_BY_NUM[c.n]}" alt="${c.name} - ${c.en}" loading="lazy" onerror="this.outerHTML='<div class=\'sym\'>'+c.sym+'</div>'">
+        <div class="nm">${c.name}</div><div class="en">${c.en} · ${c.reversed?'역방향':'정방향'}</div>
+        <div class="rev ${c.reversed?'r':''}">${c.reversed?'역방향':'정방향'}</div>
+      </div></div>`;
+    d.addEventListener('click',()=>flipCard(d,i));
+    wrap.appendChild(d);
+  });
+  // 자동으로 한 장씩 뒤집기
+  const cards=[...wrap.querySelectorAll('.tcard')];
+  cards.forEach((el,i)=> setTimeout(()=>flipCard(el,i), 500+i*650));
+  document.getElementById('deckTitle').textContent='당신이 고른 카드예요';
+  wrap.scrollIntoView({behavior:'smooth',block:'center'});
 }
 function flipCard(el,i){
   if(el.classList.contains('flipped')) return;
@@ -310,6 +361,8 @@ function resetAll(keepSpread){
   document.getElementById('deckArea').classList.remove('show');
   document.getElementById('result').classList.remove('show');
   document.getElementById('cards').innerHTML='';
+  const sd=document.getElementById('spreadDeck'); if(sd) sd.innerHTML='';
+  const pp=document.getElementById('pickProgress'); if(pp) pp.innerHTML='';
   document.getElementById('shuffleBtn').textContent='🔮 카드 셔플하기';
   if(!keepSpread) document.getElementById('q').value='';
 }
