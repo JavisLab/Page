@@ -3,249 +3,273 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>비트코인 &amp; 이더리움 실시간 시세</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<title>루나 타로 — 운명의 카드 | 프리미엄 타로 리딩</title>
+<meta name="description" content="정통 메이저 아르카나 22장으로 보는 프리미엄 타로 리딩. 오늘의 운세, 사랑, 커리어, 재물을 깊이 있게 해석해드립니다.">
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
   *{margin:0;padding:0;box-sizing:border-box}
-  body{
-    font-family:'Segoe UI',system-ui,-apple-system,'Noto Sans KR',sans-serif;
-    background:#05050f;color:#fff;min-height:100vh;overflow-x:hidden;
-  }
-  .bg{position:fixed;inset:0;z-index:0;overflow:hidden}
-  .orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;animation:float 12s ease-in-out infinite}
-  .orb1{width:520px;height:520px;background:#f7931a;top:-120px;left:-80px}
-  .orb2{width:480px;height:480px;background:#627eea;bottom:-140px;right:-60px;animation-delay:-6s}
-  .orb3{width:320px;height:320px;background:#a855f7;top:35%;left:55%;opacity:.35;animation-delay:-3s}
-  @keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.08)}}
-  .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:32px 20px 48px}
-  header{text-align:center;margin-bottom:28px}
-  .live{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(12px);padding:7px 14px;border-radius:999px;font-size:13px;letter-spacing:.12em;font-weight:700}
-  .dot{width:9px;height:9px;border-radius:50%;background:#22ff88;box-shadow:0 0 0 0 rgba(34,255,136,.7);animation:pulse 1.6s infinite}
-  @keyframes pulse{70%{box-shadow:0 0 0 10px rgba(34,255,136,0)}100%{box-shadow:0 0 0 0 rgba(34,255,136,0)}}
-  h1{font-size:clamp(32px,6vw,56px);line-height:1.05;margin:18px 0 10px;background:linear-gradient(90deg,#ffd166,#f7931a,#c084fc,#627eea);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900}
-  .sub{color:#cbd5e1;font-size:16px}
-  .meta{margin-top:14px;color:#94a3b8;font-size:13px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-  .meta b{color:#e2e8f0}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-  @media(max-width:820px){.grid{grid-template-columns:1fr}}
-  .card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:24px;padding:26px;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.45);position:relative;overflow:hidden;transition:transform .25s}
-  .card:hover{transform:translateY(-4px)}
-  .card.btc{border-top:4px solid #f7931a}
-  .card.eth{border-top:4px solid #627eea}
-  .top{display:flex;justify-content:space-between;align-items:flex-start}
-  .coin{display:flex;gap:14px;align-items:center}
-  .icon{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:30px;font-weight:900}
-  .btc .icon{background:linear-gradient(135deg,#f7931a,#ffbf69);color:#fff;box-shadow:0 0 28px rgba(247,147,26,.65)}
-  .eth .icon{background:linear-gradient(135deg,#627eea,#a5b4fc);color:#fff;box-shadow:0 0 28px rgba(98,126,234,.65)}
-  .name{font-size:22px;font-weight:800}
-  .sym{color:#94a3b8;font-size:13px;letter-spacing:.12em}
-  .badge{font-size:14px;font-weight:800;padding:8px 12px;border-radius:999px}
-  .up{background:rgba(34,197,94,.18);color:#4ade80;border:1px solid rgba(74,222,128,.35)}
-  .down{background:rgba(239,68,68,.18);color:#f87171;border:1px solid rgba(248,113,113,.35)}
-  .price{font-size:clamp(34px,5vw,46px);font-weight:900;margin:18px 0 4px;letter-spacing:-.02em;transition:color .3s}
-  .price.flash-up{color:#4ade80}
-  .price.flash-down{color:#f87171}
-  .krw{font-size:19px;color:#e2e8f0;font-weight:700}
-  .krw span{color:#94a3b8;font-weight:500;font-size:14px}
-  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
-  .stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:12px}
-  .stat label{display:block;color:#94a3b8;font-size:12px;margin-bottom:4px}
-  .stat b{font-size:15px}
-  .chart-box{height:120px;margin-top:6px}
-  .chart-section{margin-top:20px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:24px;padding:26px;backdrop-filter:blur(16px)}
-  .chart-section h2{font-size:20px;margin-bottom:6px}
-  .chart-section p{color:#94a3b8;font-size:13px;margin-bottom:14px}
-  .chart-wrap{height:300px}
-  .controls{display:flex;gap:10px;justify-content:center;margin-top:22px;flex-wrap:wrap}
-  button{cursor:pointer;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.09);color:#fff;padding:11px 18px;border-radius:999px;font-weight:700;font-size:14px}
-  button:hover{background:rgba(255,255,255,.18)}
-  button.primary{background:linear-gradient(90deg,#f7931a,#627eea);border:none}
-  .status{text-align:center;color:#94a3b8;font-size:13px;margin-top:14px;min-height:18px}
-  footer{text-align:center;color:#64748b;font-size:12px;margin-top:28px;line-height:1.7}
-  .ticker{margin:18px 0 22px;overflow:hidden;white-space:nowrap;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 0;color:#cbd5e1;font-size:14px}
-  .ticker span{margin-right:36px}
-  .ticker b{color:#fff}
+  :root{--gold:#d4af37;--gold2:#f5d76e;--purple:#7c3aed;--deep:#0b0713;--card:#17112a}
+  body{font-family:'Noto Sans KR',sans-serif;background:#0b0713;color:#f3ead8;min-height:100vh;overflow-x:hidden}
+  #stars{position:fixed;inset:0;z-index:0}
+  .moon{position:fixed;top:-90px;right:-60px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff8e1,#f5d76e 45%,#d4af37 70%,transparent 72%);opacity:.16;filter:blur(1px);z-index:0}
+  .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:28px 18px 60px}
+  header{text-align:center;padding:22px 0 8px}
+  .badge{display:inline-block;border:1px solid rgba(212,175,55,.6);color:var(--gold2);padding:7px 14px;border-radius:999px;font-size:12px;letter-spacing:.22em;font-weight:700;background:rgba(212,175,55,.08)}
+  h1{font-family:'Noto Serif KR',serif;font-size:clamp(38px,7vw,68px);line-height:1.05;margin:16px 0 10px;background:linear-gradient(180deg,#fff8d6,#d4af37 55%,#9a7b1e);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900}
+  h1 span{font-size:.55em;letter-spacing:.28em;display:block;color:#c9b8ff;-webkit-text-fill-color:#c9b8ff;margin-top:6px}
+  .sub{color:#d8cde8;font-size:16px;line-height:1.7}
+  .sub b{color:var(--gold2)}
+  .stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:20px 0}
+  .stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:8px 14px;font-size:13px}
+  .stat b{color:var(--gold2)}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0}
+  @media(max-width:760px){.steps{grid-template-columns:repeat(2,1fr)}}
+  .step{background:rgba(255,255,255,.05);border:1px solid rgba(212,175,55,.25);border-radius:16px;padding:14px;text-align:center}
+  .step .n{font-family:'Noto Serif KR',serif;color:var(--gold);font-size:22px;font-weight:900}
+  .step p{font-size:13px;color:#e6ddf5;margin-top:4px;line-height:1.5}
+  .panel{background:linear-gradient(180deg,rgba(38,24,68,.85),rgba(18,11,33,.9));border:1px solid rgba(212,175,55,.35);border-radius:24px;padding:26px;box-shadow:0 24px 70px rgba(0,0,0,.55);backdrop-filter:blur(10px)}
+  .panel h2{font-family:'Noto Serif KR',serif;font-size:22px;margin-bottom:6px;color:#fff2c2}
+  .panel p.desc{color:#c9bcd9;font-size:14px;line-height:1.7;margin-bottom:16px}
+  label{display:block;font-size:13px;color:#d8cde8;margin:14px 0 6px;font-weight:700}
+  input[type=text]{width:100%;padding:14px 16px;border-radius:14px;border:1px solid rgba(212,175,55,.4);background:rgba(0,0,0,.35);color:#fff;font-size:16px;outline:none}
+  input[type=text]:focus{border-color:var(--gold2);box-shadow:0 0 0 3px rgba(212,175,55,.2)}
+  .spreads{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
+  @media(max-width:760px){.spreads{grid-template-columns:repeat(2,1fr)}}
+  .spread{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:#eee;padding:13px 8px;border-radius:14px;cursor:pointer;text-align:center;transition:.2s}
+  .spread:hover{border-color:var(--gold)}
+  .spread.active{background:linear-gradient(135deg,#d4af37,#7c3aed);border-color:transparent;color:#fff;font-weight:800}
+  .spread .e{font-size:20px;display:block}
+  .spread b{font-size:13px;display:block;margin-top:4px}
+  .spread small{font-size:11px;color:#d8cde8;display:block}
+  .spread.active small{color:#ffe}
+  .shuffle-btn{width:100%;margin-top:20px;padding:16px;border:none;border-radius:16px;background:linear-gradient(90deg,#d4af37,#b8860b,#7c3aed);color:#fff;font-size:17px;font-weight:900;cursor:pointer;letter-spacing:.04em;box-shadow:0 10px 30px rgba(212,175,55,.35)}
+  .shuffle-btn:disabled{opacity:.6;cursor:wait}
+  .shuffle-btn:hover{filter:brightness(1.1)}
+  .hint{text-align:center;color:#a99bc2;font-size:13px;margin-top:10px}
+  .deck-area{display:none;margin-top:22px;text-align:center}
+  .deck-area.show{display:block}
+  .deck-title{font-family:'Noto Serif KR',serif;font-size:18px;color:#ffe9a8;margin-bottom:4px}
+  .deck-sub{color:#b8a9d1;font-size:13px;margin-bottom:16px}
+  .cards{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+  .tcard{width:158px;height:248px;perspective:1000px;cursor:pointer}
+  .tcard-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.2,.7,.3,1.2)}
+  .tcard.flipped .tcard-inner{transform:rotateY(180deg)}
+  .tcard-face{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;overflow:hidden;border:2px solid #d4af37}
+  .tcard-back{background:radial-gradient(circle at 50% 30%,#3b2a6b,#140d2b 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  .tcard-back .moon-sym{font-size:42px}
+  .tcard-back .pat{font-size:11px;letter-spacing:.3em;color:#d4af37}
+  .tcard-back .lun{font-family:'Noto Serif KR',serif;font-size:15px;color:#f5d76e}
+  .tcard-front{background:linear-gradient(180deg,#fff8e1,#f3e2a8);color:#1a102e;transform:rotateY(180deg);padding:12px;display:flex;flex-direction:column;text-align:center}
+  .tcard-front.reversed{transform:rotateY(180deg) rotate(180deg)}
+  .tcard-front .num{font-family:'Noto Serif KR',serif;font-size:12px;letter-spacing:.15em;color:#7c3aed;font-weight:900}
+  .tcard-front .sym{font-size:46px;margin:10px 0 6px}
+  .tcard-front .nm{font-family:'Noto Serif KR',serif;font-size:19px;font-weight:900;line-height:1.2}
+  .tcard-front .en{font-size:10px;letter-spacing:.12em;color:#6b5a8a;text-transform:uppercase;margin-top:4px}
+  .tcard-front .rev{margin-top:auto;font-size:11px;font-weight:800;padding:5px;border-radius:999px;background:#7c3aed;color:#fff}
+  .tcard-front .rev.r{background:#b91c1c}
+  .pos{font-size:12px;color:#d4af37;font-weight:800;margin-bottom:8px;letter-spacing:.08em}
+  .result{display:none;margin-top:26px}
+  .result.show{display:block}
+  .overall{background:linear-gradient(135deg,rgba(212,175,55,.18),rgba(124,58,237,.18));border:1px solid rgba(212,175,55,.5);border-radius:20px;padding:22px;margin-bottom:18px}
+  .overall h3{font-family:'Noto Serif KR',serif;color:#ffe9a8;font-size:20px;margin-bottom:8px}
+  .overall p{line-height:1.85;color:#fff;font-size:15px}
+  .overall .q{color:#d8cde8;font-size:13px;margin-top:10px}
+  .reading{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:20px;margin-bottom:14px}
+  .reading header{text-align:left;padding:0;display:flex;gap:14px;align-items:center}
+  .reading .r-sym{width:58px;height:58px;border-radius:14px;background:linear-gradient(135deg,#d4af37,#7c3aed);display:grid;place-items:center;font-size:30px}
+  .reading h4{font-family:'Noto Serif KR',serif;font-size:20px}
+  .reading h4 small{color:#c9b8ff;font-size:12px;display:block;margin-top:2px}
+  .keywords{margin:12px 0;display:flex;gap:6px;flex-wrap:wrap}
+  .kw{background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.35);color:#ffe9a8;padding:5px 10px;border-radius:999px;font-size:12px}
+  .sec{margin-top:12px}
+  .sec b{color:var(--gold2);font-size:13px}
+  .sec p{font-size:14px;line-height:1.8;color:#eee;margin-top:3px}
+  .lucky{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .lucky span{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.15);padding:7px 11px;border-radius:999px;font-size:12px}
+  .actions{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+  .actions button{padding:12px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-weight:700;cursor:pointer}
+  .actions button.primary{background:linear-gradient(90deg,#d4af37,#7c3aed);border:none}
+  .note{margin-top:22px;text-align:center;color:#8f84a8;font-size:12px;line-height:1.7}
+  footer{margin-top:26px;text-align:center;color:#6f658a;font-size:12px}
+  .shuffling{animation:shake .45s infinite}
+  @keyframes shake{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg) translateY(-4px)}}
 </style>
 </head>
 <body>
-<div class="bg"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
+<canvas id="stars"></canvas><div class="moon"></div>
 <div class="wrap">
   <header>
-    <div class="live"><span class="dot"></span> LIVE &nbsp;•&nbsp; 실시간 시세</div>
-    <h1>비트코인 &amp; 이더리움<br>실시간 시세</h1>
-    <p class="sub">10초마다 자동 업데이트되는 화려한 크립토 대시보드</p>
-    <div class="meta">
-      <span>마지막 업데이트: <b id="updated">—</b></span>
-      <span>다음 업데이트까지: <b id="countdown">10초</b></span>
-      <span>출처: <b>CoinGecko</b></span>
+    <div class="badge">✦ PREMIUM TAROT READING ✦</div>
+    <h1>루나 타로<span>LUNA TAROT</span></h1>
+    <p class="sub">정통 메이저 아르카나 22장, 돈 주고 보는 그 깊이 그대로.<br><b>마음을 비우고, 질문을 품고, 카드를 뽑으세요.</b> 카드가 당신의 이야기를 들려줄 거예요.</p>
+    <div class="stats"><span class="stat">🔮 메이저 아르카나 <b>22장</b></span><span class="stat">✦ 정방향 · 역방향 <b>정밀 해석</b></span><span class="stat">💜 사랑 · 커리어 · 재물</span></div>
+    <div class="steps">
+      <div class="step"><div class="n">01</div><p>질문을<br>마음속으로 정하기</p></div>
+      <div class="step"><div class="n">02</div><p>스프레드를<br>고르고 셔플하기</p></div>
+      <div class="step"><div class="n">03</div><p>끌리는 카드를<br>직접 뒤집기</p></div>
+      <div class="step"><div class="n">04</div><p>깊이 있는 해석을<br>천천히 읽기</p></div>
     </div>
   </header>
 
-  <div class="ticker" id="ticker"><span>불러오는 중…</span></div>
+  <section class="panel">
+    <h2>🌙 오늘, 무엇을 묻고 싶으세요?</h2>
+    <p class="desc">막연해도 괜찮아요. “이 길이 맞을까?”, “그 사람 마음은?”, “지금 시작해도 될까?” — 마음에 가장 먼저 떠오르는 질문 하나를 품으세요.</p>
+    <label for="q">당신의 질문</label>
+    <input type="text" id="q" placeholder="예) 지금 이직을 준비해도 될까요? / 그 사람과 잘 될 수 있을까요?">
+    <label>스프레드 선택</label>
+    <div class="spreads" id="spreads">
+      <div class="spread active" data-spread="today" data-count="1"><span class="e">☀️</span><b>오늘의 카드</b><small>1장 · 오늘의 흐름</small></div>
+      <div class="spread" data-spread="past" data-count="3"><span class="e">⏳</span><b>과거·현재·미래</b><small>3장 · 전체 흐름</small></div>
+      <div class="spread" data-spread="love" data-count="3"><span class="e">💗</span><b>사랑 · 연애</b><small>3장 · 마음의 방향</small></div>
+      <div class="spread" data-spread="career" data-count="3"><span class="e">💼</span><b>커리어 · 일</b><small>3장 · 일과 성장</small></div>
+      <div class="spread" data-spread="money" data-count="3"><span class="e">💰</span><b>재물 · 돈</b><small>3장 · 돈의 흐름</small></div>
+    </div>
+    <button class="shuffle-btn" id="shuffleBtn" onclick="shuffle()">🔮 카드 셔플하기</button>
+    <p class="hint">셔플하면 카드가 섞입니다. 끌리는 카드를 눌러 뒤집어 보세요.</p>
 
-  <div class="grid">
-    <section class="card btc">
-      <div class="top">
-        <div class="coin"><div class="icon">₿</div><div><div class="name">비트코인</div><div class="sym">BTC / USD • KRW</div></div></div>
-        <div class="badge up" id="btc-change">—</div>
-      </div>
-      <div class="price" id="btc-price">$ —</div>
-      <div class="krw" id="btc-krw">₩ — <span>원</span></div>
-      <div class="stats">
-        <div class="stat"><label>24시간 최고가</label><b id="btc-high">—</b></div>
-        <div class="stat"><label>24시간 최저가</label><b id="btc-low">—</b></div>
-        <div class="stat"><label>시가총액</label><b id="btc-cap">—</b></div>
-        <div class="stat"><label>24시간 거래량</label><b id="btc-vol">—</b></div>
-      </div>
-      <div class="chart-box"><canvas id="btc-chart"></canvas></div>
-    </section>
+    <div class="deck-area" id="deckArea">
+      <div class="deck-title" id="deckTitle">카드를 선택하세요</div>
+      <div class="deck-sub" id="deckSub">마음이 가는 카드를 순서대로 뒤집으세요. 정방향·역방향은 운명이 정합니다.</div>
+      <div class="cards" id="cards"></div>
+    </div>
 
-    <section class="card eth">
-      <div class="top">
-        <div class="coin"><div class="icon">Ξ</div><div><div class="name">이더리움</div><div class="sym">ETH / USD • KRW</div></div></div>
-        <div class="badge up" id="eth-change">—</div>
+    <div class="result" id="result">
+      <div class="overall" id="overall"></div>
+      <div id="readings"></div>
+      <div class="actions">
+        <button class="primary" onclick="resetAll()">↺ 다시 리딩하기</button>
+        <button onclick="copyReading()">📋 결과 복사하기</button>
       </div>
-      <div class="price" id="eth-price">$ —</div>
-      <div class="krw" id="eth-krw">₩ — <span>원</span></div>
-      <div class="stats">
-        <div class="stat"><label>24시간 최고가</label><b id="eth-high">—</b></div>
-        <div class="stat"><label>24시간 최저가</label><b id="eth-low">—</b></div>
-        <div class="stat"><label>시가총액</label><b id="eth-cap">—</b></div>
-        <div class="stat"><label>24시간 거래량</label><b id="eth-vol">—</b></div>
-      </div>
-      <div class="chart-box"><canvas id="eth-chart"></canvas></div>
-    </section>
-  </div>
-
-  <section class="chart-section">
-    <h2>📈 지난 24시간 가격 흐름</h2>
-    <p>BTC(주황) vs ETH(보라) — USD 기준, CoinGecko 24시간 차트</p>
-    <div class="chart-wrap"><canvas id="main-chart"></canvas></div>
+      <p class="note">타로는 길을 보여주는 거울입니다. 최종 선택은 언제나 당신의 몫이에요.<br>이 리딩은 재미와 성찰을 위한 것으로, 중요한 결정은 신중하게 생각해 보세요.</p>
+    </div>
   </section>
-
-  <div class="controls">
-    <button class="primary" onclick="fetchAll(true)">🔄 지금 새로고침</button>
-    <button onclick="toggleAuto()" id="auto-btn">⏸ 자동 업데이트 끄기</button>
-  </div>
-  <div class="status" id="status">연결 중…</div>
-
-  <footer>
-    데이터 출처: CoinGecko Public API • 10초마다 자동 갱신 • 투자 조언이 아닙니다.<br>
-    JavisLab/Page • GitHub Pages
-  </footer>
+  <footer>LUNA TAROT • Major Arcana 22 • JavisLab/Page • GitHub Pages</footer>
 </div>
 
 <script>
-const fmtUSD = n => '$' + Number(n).toLocaleString('en-US', {maximumFractionDigits: 2});
-const fmtKRW = n => '₩' + Math.round(Number(n)).toLocaleString('ko-KR');
-const fmtBig = n => {
-  if (!n) return '—';
-  if (n >= 1e12) return '$' + (n/1e12).toFixed(2) + '조';
-  if (n >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B';
-  if (n >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
-  return fmtUSD(n);
+const CARDS=[
+{n:0,name:"바보",en:"The Fool",sym:"🤡",kw:["새로운 시작","순수","모험","자유"],up:"지금 당신 앞에 놓인 문은 아직 열려 있습니다. 두려움보다 설렘이 먼저라면, 그건 가야 한다는 신호예요. 완벽한 준비를 기다리기보다 한 발 내딛는 용기가 운을 트이게 합니다.",rev:"성급한 결정이나 준비 없는 도전을 경고합니다. 지금은 멈춰서 지도를 다시 확인해야 할 때예요. 가벼움이 무책임이 되지 않도록, 한 번만 더 돌아보세요.",loveU:"솔직하고 순수한 만남이 다가옵니다. 있는 그대로의 당신이 가장 매력적이에요.",loveR:"상대에게 너무 많은 것을 기대하거나, 반대로 마음을 닫고 있을 수 있어요. 서두르지 말고 천천히 확인하세요.",careerU:"새로운 분야, 새로운 시작에 좋은 기운이 있습니다. 배우려는 자세가 기회를 부릅니다.",careerR:"무모한 이직이나 준비 없는 창업은 조심하세요. 기초를 다지는 시간이 필요합니다.",moneyU:"작은 모험이 씨앗이 됩니다. 다만 전재산을 걸지는 마세요.",moneyR:"충동적인 지출을 주의하세요. 지금은 모으는 연습이 필요합니다.",advice:"두려워도 한 걸음. 단, 눈은 뜨고 가세요.",color:"하늘색",num:0},
+{n:1,name:"마법사",en:"The Magician",sym:"🪄",kw:["의지","창조","능력","시작"],up:"당신에게 필요한 도구는 이미 손안에 있습니다. 의지를 하나로 모으면 생각은 현실이 됩니다. 지금은 말보다 행동, 계획보다 실행의 시간입니다.",rev:"능력을 의심하거나 에너지를 흩뜨리고 있을 수 있어요. 재능은 있는데 방향이 흐릿합니다. 한 가지에 집중하세요.",loveU:"매력적인 만남, 적극적인 고백이 잘 통합니다. 당신이 먼저 다가갈 때 사랑이 움직여요.",loveR:"말만 번지르르한 관계일 수 있어요. 행동으로 보여주는지 확인하세요.",careerU:"기획, 발표, 협상에서 빛납니다. 당신의 능력을 보여줄 무대가 옵니다.",careerR:"실력에 비해 기회를 잡지 못하고 있어요. 준비물을 점검하고 다시 도전하세요.",moneyU:"아이디어가 돈이 되는 시기입니다. 부업이나 새로운 수입원을 고민해 보세요.",moneyR:"허황된 투자 이야기에 속지 마세요. 검증된 것부터 하세요.",advice:"당신의 손에 이미 답이 있어요. 쓰세요.",color:"빨강",num:1},
+{n:2,name:"여사제",en:"The High Priestess",sym:"🌙",kw:["직관","비밀","내면","지혜"],up:"답은 밖에 있지 않고 당신 안에 있습니다. 조용한 시간에 떠오르는 첫 느낌을 믿으세요. 아직 말하지 않은 진실, 보이지 않는 흐름이 당신을 돕고 있어요.",rev:"직감을 무시하거나 소문에 휘둘리고 있을 수 있어요. 겉으로 보이는 말보다 당신의 느낌이 더 정확합니다.",loveU:"말로 표현되지 않는 깊은 끌림이 있어요. 상대의 진심은 행동의 여백에 숨어 있습니다.",loveR:"비밀이나 오해가 관계를 가로막고 있어요. 억측보다 직접 묻는 것이 빠릅니다.",careerU:"정보를 모으고 기다리는 것이 유리합니다. 서두르면 손해예요.",careerR:"직감을 무시하고 남의 말만 따르고 있어요. 당신만의 판단이 필요합니다.",moneyU:"숨은 정보, 조용한 기회가 있습니다. 급하게 움직이지 마세요.",moneyR:"모르는 분야에 함부로 들어가지 마세요.",advice:"조용히 듣세요. 답은 이미 알고 있어요.",color:"보라",num:2},
+{n:3,name:"여황제",en:"The Empress",sym:"👑",kw:["풍요","사랑","창조","성장"],up:"지금은 사랑받고 자라는 시기입니다. 당신이 애정을 쏟은 일은 풍성하게 열매를 맺을 거예요. 몸과 마음을 돌보고, 창조적인 에너지를 마음껏 쓰세요.",rev:"자기 돌봄이 부족하거나, 애정을 주고만 지쳐 있을 수 있어요. 받기도 연습하세요.",loveU:"따뜻하고 풍요로운 사랑이 무르익습니다. 결혼, 임신, 깊은 결속에도 좋은 기운이에요.",loveR:"애정을 갈구하느라 스스로를 잃고 있어요. 먼저 나를 채우세요.",careerU:"창의적인 일, 사람을 돌보는 일에서 성과가 납니다.",careerR:"과로와 번아웃을 조심하세요. 쉬는 것도 일입니다.",moneyU:"꾸준한 수입, 풍요로운 흐름이 예상됩니다.",moneyR:"과소비와 감정적 지출을 조심하세요.",advice:"당신은 풍요로울 자격이 있어요. 받으세요.",color:"분홍",num:3},
+{n:4,name:"황제",en:"The Emperor",sym:"🦁",kw:["권위","안정","리더십","책임"],up:"질서와 구조가 당신을 지켜줍니다. 감정에 휘둘리지 말고 원칙대로 가세요. 책임을 지는 만큼 당신의 자리는 단단해집니다.",rev:"너무 통제하거나, 반대로 통제를 잃고 있을 수 있어요. 유연함이 필요합니다.",loveU:"믿음직한 인연, 안정적인 관계가 잘 맞습니다.",loveR:"고집과 자존심이 다툼을 만들고 있어요. 한 발 물러나세요.",careerU:"리더십을 발휘할 때입니다. 승진, 프로젝트 주도에도 좋은 흐름이에요.",careerR:"권위에 눌려 있거나, 지나치게 경직되어 있어요.",moneyU:"안정적인 자산 관리가 유리합니다.",moneyR:"무모한 모험보다 계획적인 관리가 필요합니다.",advice:"기둥이 되세요. 흔들려도 무너지지 않게.",color:"남색",num:4},
+{n:5,name:"교황",en:"The Hierophant",sym:"⛪",kw:["전통","가르침","신념","조언"],up:"검증된 길이 답일 수 있습니다. 멘토나 선배의 조언, 전통적인 방법이 지금 당신에게 가장 빠른 지름길이에요.",rev:"틀에 갇혀 있거나, 반대로 전통을 무시하다 손해 볼 수 있어요. 당신만의 방식을 찾되 기본은 지키세요.",loveU:"진지한 만남, 결혼을 전제로 한 관계에 좋은 기운입니다.",loveR:"주변의 시선이나 관습에 얽매여 마음을 숨기고 있어요.",careerU:"자격증, 교육, 멘토링이 도움이 됩니다.",careerR:"낡은 방식에 머물러 있어요. 배울 것은 배우되, 나만의 색을 더하세요.",moneyU:"안정적인 금융 상품, 전문가의 조언이 유리합니다.",moneyR:"검증되지 않은 정보에 흔들리지 마세요.",advice:"스승을 찾으세요. 길은 이미 있어요.",color:"금색",num:5},
+{n:6,name:"연인",en:"The Lovers",sym:"💞",kw:["사랑","선택","조화","결단"],up:"마음이 가리키는 곳으로 가세요. 중요한 선택의 순간입니다. 가치관이 맞는 사람, 진심이 통하는 길이 당신의 행복과 연결되어 있어요.",rev:"선택을 미루거나, 가치관이 어긋난 관계에 머물러 있을 수 있어요. 마음의 소리를 외면하지 마세요.",loveU:"운명적인 만남, 깊은 사랑이 무르익습니다. 솔직한 대화가 관계를 한 단계 올립니다.",loveR:"갈등과 삼각관계, 가치관 충돌을 조심하세요.",careerU:"파트너십, 협업이 중요합니다. 좋은 동료가 행운을 가져옵니다.",careerR:"이해관계만으로 맺은 관계는 오래가기 어려워요.",moneyU:"공동 투자나 파트너와의 금전 문제는 신중하게.",moneyR:"감정적인 소비를 조심하세요.",advice:"마음이 아는 답을 믿으세요.",color:"빨강",num:6},
+{n:7,name:"전차",en:"The Chariot",sym:"🏆",kw:["승리","의지","전진","집중"],up:"지금은 멈추지 않고 달릴 때입니다. 방향만 분명하다면 장애물은 연료가 됩니다. 당신의 의지가 승리를 끌어당기고 있어요.",rev:"방향을 잃고 질주하거나, 반대로 의욕이 꺾여 있을 수 있어요. 잠깐 멈춰 핸들을 다시 잡으세요.",loveU:"적극적인 구애, 장거리 연애의 극복 등 노력이 결실을 맺습니다.",loveR:"밀어붙이기만 하다 상대가 지칠 수 있어요. 속도 조절이 필요해요.",careerU:"경쟁, 시험, 프로젝트에서 승리할 기운이 강합니다.",careerR:"무리한 욕심이 탈을 부를 수 있어요.",moneyU:"목표를 향한 저축과 실행이 빛을 봅니다.",moneyR:"과속은 금물, 계획대로 가세요.",advice:"핸들을 놓지 마세요. 당신은 이길 수 있어요.",color:"파랑",num:7},
+{n:8,name:"힘",en:"Strength",sym:"🦁",kw:["용기","인내","내면의 힘","포용"],up:"강한 것이 아니라 부드럽게 이기는 힘입니다. 인내와 따뜻함으로 어려운 상황을 녹이세요. 당신은 생각보다 훨씬 강합니다.",rev:"자신감을 잃거나, 분노를 억누르고 있을 수 있어요. 감정을 인정하는 것부터 시작하세요.",loveU:"인내심 있는 사랑이 결실을 맺습니다. 상대를 바꾸려 하지 말고 이해하세요.",loveR:"감정 폭발이나 냉담한 태도를 조심하세요.",careerU:"끈기와 성실함이 인정받는 시기입니다.",careerR:"번아웃 직전일 수 있어요. 스스로를 몰아붙이지 마세요.",moneyU:"꾸준함이 자산을 만듭니다.",moneyR:"조급함이 손실을 부릅니다.",advice:"부드러움이 가장 강한 힘이에요.",color:"주황",num:8},
+{n:9,name:"은둔자",en:"The Hermit",sym:"🕯️",kw:["성찰","지혜","고독","탐구"],up:"혼자만의 시간이 필요합니다. 답을 찾기 위해 밖으로 뛰기보다 안으로 들어가 보세요. 조용한 성찰 끝에 진짜 길이 보입니다.",rev:"고립되거나 생각을 너무 오래 미루고 있을 수 있어요. 혼자만의 방에서 나와야 할 때입니다.",loveU:"서두르지 않는 사랑이 깊어집니다. 혼자만의 시간을 존중해 주세요.",loveR:"소통 단절이 길어지고 있어요. 먼저 손을 내미세요.",careerU:"연구, 공부, 자기계발에 좋은 시기입니다.",careerR:"혼자 끙끙대지 말고 조언을 구하세요.",moneyU:"조용히 모으고 공부하는 시기입니다.",moneyR:"검증되지 않은 투자에 손대지 마세요.",advice:"등불을 들고 안으로 들어가세요.",color:"회색",num:9},
+{n:10,name:"운명의 수레바퀴",en:"Wheel of Fortune",sym:"🎡",kw:["운명","전환","행운","순환"],up:"운의 바퀴가 당신 쪽으로 돌고 있습니다. 예상치 못한 좋은 소식, 반전의 기회가 올 수 있어요. 흐름에 몸을 맡기세요.",rev:"운이 잠시 멈춘 것처럼 느껴질 수 있어요. 지금은 흐름을 거스르지 말고 다음 바퀴를 준비하세요.",loveU:"운명적인 재회, 새로운 만남의 가능성이 큽니다.",loveR:"반복되는 패턴을 끊어야 합니다.",careerU:"예상 밖의 기회가 찾아옵니다. 열린 마음으로 받아들이세요.",careerR:"변화에 저항하고 있어요. 흐름을 타세요.",moneyU:"뜻밖의 수입이나 기회가 있을 수 있어요.",moneyR:"도박성 투자는 피하세요.",advice:"바퀴는 돕니다. 당신의 차례가 와요.",color:"무지개",num:10},
+{n:11,name:"정의",en:"Justice",sym:"⚖️",kw:["공정","진실","균형","결단"],up:"진실이 당신 편입니다. 공정하게, 정직하게 가면 결과도 공정하게 돌아옵니다. 계약, 법적 문제에도 좋은 흐름이에요.",rev:"불공정한 대우나 편향된 판단이 있을 수 있어요. 감정보다 사실로 말하세요.",loveU:"솔직한 대화가 관계를 바로잡습니다.",loveR:"한쪽만 노력하는 관계는 오래가기 어려워요.",careerU:"평가와 계약에서 정당한 대가를 받습니다.",careerR:"불공정한 대우를 참고만 있지 마세요.",moneyU:"정당한 수입, 공정한 거래가 유리합니다.",moneyR:"서류와 계약서를 꼼꼼히 확인하세요.",advice:"저울은 거짓말을 하지 않아요.",color:"흰색",num:11},
+{n:12,name:"매달린 사람",en:"The Hanged Man",sym:"🙃",kw:["희생","새로운 관점","인내","전환"],up:"지금 멈춰 있는 것처럼 보여도, 그 멈춤이 당신을 바꾸고 있습니다. 관점을 뒤집으면 답이 보입니다. 기다림이 곧 지혜예요.",rev:"헛된 희생이나 미루기만 하고 있을 수 있어요. 기다림과 방치를 구분하세요.",loveU:"상대를 기다려주는 사랑이 필요합니다. 조급함은 금물이에요.",loveR:"희생만 하는 관계라면 균형을 되찾아야 해요.",careerU:"지금은 추진보다 관망이 유리합니다.",careerR:"포기해야 할 것과 기다려야 할 것을 구분하세요.",moneyU:"지출을 멈추고 흐름을 관찰하세요.",moneyR:"손실을 만회하려다 더 잃을 수 있어요.",advice:"거꾸로 보면 길이 보여요.",color:"파랑",num:12},
+{n:13,name:"죽음",en:"Death",sym:"🦋",kw:["끝과 시작","변화","재생","해방"],up:"끝은 끝이 아니라 시작입니다. 놓아야 할 것을 놓으면 새로운 문이 열립니다. 두려워하지 마세요. 당신은 다시 태어나는 중이에요.",rev:"변화를 거부하거나 과거에 매달려 있을 수 있어요. 놓지 못하면 새로움이 들어올 자리가 없습니다.",loveU:"낡은 관계의 끝, 혹은 관계의 완전히 새로운 시작이 옵니다.",loveR:"끝난 인연에 매달리지 마세요.",careerU:"이직, 전환, 새로운 시작에 강력한 기운입니다.",careerR:"변화를 두려워해 기회를 놓치고 있어요.",moneyU:"지출 구조를 완전히 바꾸는 것이 좋습니다.",moneyR:"낡은 투자 방식을 버리세요.",advice:"놓으세요. 그래야 새것이 와요.",color:"검정",num:13},
+{n:14,name:"절제",en:"Temperance",sym:"🌈",kw:["균형","조화","인내","치유"],up:"서두르지 않는 균형이 답입니다. 일과 쉼, 마음과 현실의 조화를 찾으세요. 천천히, 그러나 꾸준히 가는 길이 가장 빠릅니다.",rev:"균형이 깨져 있거나 극단으로 치닫고 있을 수 있어요. 중용을 되찾으세요.",loveU:"서로를 존중하는 균형 잡힌 사랑이 무르익습니다.",loveR:"한쪽으로 치우친 감정이 관계를 흔들고 있어요.",careerU:"협업과 조율이 성과로 이어집니다.",careerR:"과로와 방만함을 모두 조심하세요.",moneyU:"수입과 지출의 균형을 맞추세요.",moneyR:"극단적인 절약이나 소비를 피하세요.",advice:"섞으세요. 조화가 답이에요.",color:"연두",num:14},
+{n:15,name:"악마",en:"The Devil",sym:"😈",kw:["집착","유혹","속박","욕망"],up:"당신을 묶고 있는 것은 무엇인가요? 집착, 중독, 두려움의 사슬을 보세요. 사슬은 생각보다 쉽게 풀립니다. 먼저 인정하는 것이 해방의 시작이에요.",rev:"속박에서 벗어나고 있는 중입니다. 해방의 기운이 강해요.",loveU:"강렬한 끌림이 있지만 집착으로 변하지 않게 조심하세요.",loveR:"의존적인 관계에서 벗어나고 있어요.",careerU:"돈이나 지위에 대한 집착이 판단력을 흐릴 수 있어요.",careerR:"해방이 가까워요. 용기를 내세요.",moneyU:"물질적 욕망을 경계하세요.",moneyR:"사기성 유혹을 조심하세요.",advice:"사슬은 당신이 만든 거예요. 풀 수 있어요.",color:"검정",num:15},
+{n:16,name:"탑",en:"The Tower",sym:"⚡",kw:["붕괴","갑작스러운 변화","깨달음","해방"],up:"쌓아 올린 것이 무너지는 것처럼 보여도, 그건 거짓 기반이 무너지는 것입니다. 진실이 드러나면 더 단단한 것을 세울 수 있어요.",rev:"위기를 피하고 있지만 불안은 남아 있어요. 작은 균열부터 고치세요.",loveU:"충격적인 진실이 드러날 수 있지만, 그 뒤에 진짜가 남습니다.",loveR:"감추던 갈등이 터질 수 있어요.",careerU:"예상치 못한 변화가 오지만, 그게 전환점이 됩니다.",careerR:"변화를 미루면 충격이 커집니다.",moneyU:"예상 밖의 지출을 대비하세요.",moneyR:"기초가 약한 투자에서 빠져나오세요.",advice:"무너지는 건 거짓이에요. 진실은 남아요.",color:"빨강",num:16},
+{n:17,name:"별",en:"The Star",sym:"⭐",kw:["희망","치유","영감","평화"],up:"어두운 밤이 지나면 별이 보입니다. 희망을 품으세요. 당신의 꿈은 아직 살아 있고, 치유의 시간이 시작되었어요.",rev:"희망을 잃거나 지쳐 있을 수 있어요. 작은 빛부터 다시 보세요.",loveU:"순수하고 희망적인 사랑이 다가옵니다.",loveR:"실망이 크지만 희망은 아직 남아 있어요.",careerU:"꿈을 향한 길이 다시 열립니다.",careerR:"지친 마음을 먼저 돌보세요.",moneyU:"서서히 회복되는 흐름입니다.",moneyR:"무리하지 말고 천천히 회복하세요.",advice:"별을 보세요. 아직 빛나고 있어요.",color:"하늘색",num:17},
+{n:18,name:"달",en:"The Moon",sym:"🌕",kw:["불안","환상","무의식","혼란"],up:"지금 보이는 것이 전부가 아닐 수 있어요. 불안과 환상 사이에서 당신의 직감이 진실을 가리킵니다. 서두른 판단은 금물, 시간을 두고 확인하세요.",rev:"혼란이 걷히고 진실이 드러나고 있습니다.",loveU:"오해와 불안이 커질 수 있어요. 직접 확인하는 것이 답입니다.",loveR:"숨기던 감정이 드러나고 있어요.",careerU:"불확실한 정보에 흔들리지 마세요.",careerR:"안개가 걷히고 있어요.",moneyU:"불확실한 투자는 피하세요.",moneyR:"사기나 오해를 조심하세요.",advice:"달빛에 속지 마세요. 아침은 와요.",color:"은색",num:18},
+{n:19,name:"태양",en:"The Sun",sym:"☀️",kw:["성공","기쁨","활력","명확함"],up:"가장 밝은 카드입니다. 성공, 기쁨, 생기가 당신 곁에 있어요. 자신 있게 나아가세요. 당신의 빛은 숨길 수 없습니다.",rev:"기쁨이 잠시 가려져 있을 뿐, 사라진 게 아니에요.",loveU:"밝고 건강한 사랑이 무르익습니다. 결혼, 출산에도 좋은 기운이에요.",loveR:"작은 오해일 뿐, 본질은 따뜻해요.",careerU:"성공과 인정이 따릅니다. 마음껏 빛나세요.",careerR:"자신감을 되찾으세요. 당신은 빛나고 있어요.",moneyU:"풍요로운 흐름이 예상됩니다.",moneyR:"기쁨을 나누는 지출은 괜찮아요.",advice:"햇살 아래로 나오세요.",color:"노랑",num:19},
+{n:20,name:"심판",en:"Judgement",sym:"📯",kw:["부활","깨달음","결단","소명"],up:"지난 일을 정리하고 다시 일어설 때입니다. 용서하고, 배우고, 새롭게 시작하세요. 당신의 소명이 당신을 부르고 있어요.",rev:"과거에 갇혀 자책하고 있을 수 있어요. 용서는 나를 위한 일입니다.",loveU:"재회나 관계의 부활 가능성이 있어요.",loveR:"과거를 정리하지 않으면 새 사랑이 들어오지 않아요.",careerU:"새로운 소명, 재도전의 기회가 옵니다.",careerR:"자기 비판을 멈추고 앞으로 가세요.",moneyU:"과거의 실수에서 배운 것이 자산이 됩니다.",moneyR:"미뤄둔 정산을 하세요.",advice:"일어나세요. 두 번째 기회가 와요.",color:"흰색",num:20},
+{n:21,name:"세계",en:"The World",sym:"🌍",kw:["완성","성취","통합","여행"],up:"한 바퀴가 완성되는 순간입니다. 당신이 해온 모든 것이 하나로 이어져 성취로 이어집니다. 축하하세요. 그리고 다음 여정을 꿈꾸세요.",rev:"완성이 코앞인데 마무리가 안 되고 있어요. 마지막 한 걸음이 필요합니다.",loveU:"완성된 사랑, 깊은 결속이 이루어집니다.",loveR:"마무리가 필요해요. 끝맺음을 하세요.",careerU:"프로젝트의 완성, 큰 성취가 예상됩니다.",careerR:"마지막 정리만 잘하면 됩니다.",moneyU:"노력의 결실이 돌아옵니다.",moneyR:"마무리 정산을 깔끔히 하세요.",advice:"당신은 이미 완성되어 가고 있어요.",color:"금색",num:21}
+];
+let selectedSpread='today', selectedCount=1, drawn=[], flipped=0;
+const spreadPos={
+ today:["오늘의 카드"],
+ past:["과거 — 지나온 길","현재 — 지금 서 있는 곳","미래 — 다가올 흐름"],
+ love:["당신의 마음","상대의 마음","두 사람의 미래"],
+ career:["지금의 일","숨은 과제","다가올 기회"],
+ money:["돈의 현재","막고 있는 것","돈의 흐름"]
 };
-let auto = true, countdown = 10, timer = null;
-let prev = {bitcoin: null, ethereum: null};
-let btcChart, ethChart, mainChart;
-
-function setBadge(el, change){
-  const v = Number(change);
-  el.textContent = (v >= 0 ? '▲ +' : '▼ ') + v.toFixed(2) + '% (24h)';
-  el.className = 'badge ' + (v >= 0 ? 'up' : 'down');
+document.querySelectorAll('.spread').forEach(el=>{
+  el.addEventListener('click',()=>{
+    document.querySelectorAll('.spread').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    selectedSpread=el.dataset.spread; selectedCount=Number(el.dataset.count);
+    resetAll(true);
+  });
+});
+function shuffle(){
+  const btn=document.getElementById('shuffleBtn');
+  btn.disabled=true; btn.textContent='🔮 카드를 섞는 중…';
+  document.getElementById('result').classList.remove('show');
+  const area=document.getElementById('deckArea');
+  area.classList.add('show');
+  // shuffle animation on button
+  btn.classList.add('shuffling');
+  setTimeout(()=>{
+    btn.classList.remove('shuffling'); btn.disabled=false; btn.textContent='🔮 다시 셔플하기';
+    // draw unique cards
+    const pool=[...CARDS].sort(()=>Math.random()-0.5);
+    drawn=pool.slice(0,selectedCount).map(c=>({...c, reversed: Math.random()<0.35}));
+    flipped=0;
+    const titles={today:'오늘 당신에게 온 카드',past:'과거 · 현재 · 미래',love:'사랑의 흐름',career:'커리어의 흐름',money:'재물의 흐름'};
+    document.getElementById('deckTitle').textContent=titles[selectedSpread]+' — 카드를 뒤집어 보세요';
+    const wrap=document.getElementById('cards'); wrap.innerHTML='';
+    drawn.forEach((c,i)=>{
+      const d=document.createElement('div'); d.className='tcard'; d.dataset.i=i;
+      d.innerHTML=`<div class="pos">${spreadPos[selectedSpread][i]||''}</div><div class="tcard-inner">
+        <div class="tcard-face tcard-back"><div class="moon-sym">🌙</div><div class="lun">LUNA TAROT</div><div class="pat">✦ ✦ ✦</div></div>
+        <div class="tcard-face tcard-front ${c.reversed?'reversed':''}">
+          <div class="num">${String(c.n).padStart(2,'0')} · ${c.reversed?'역방향':'정방향'}</div>
+          <div class="sym">${c.sym}</div><div class="nm">${c.name}</div><div class="en">${c.en}</div>
+          <div class="rev ${c.reversed?'r':''}">${c.reversed?'역방향':'정방향'}</div>
+        </div></div>`;
+      d.addEventListener('click',()=>flipCard(d,i));
+      wrap.appendChild(d);
+    });
+    area.scrollIntoView({behavior:'smooth',block:'center'});
+  },900);
 }
-function flash(el, oldVal, newVal){
-  if (oldVal === null) return;
-  el.classList.remove('flash-up','flash-down');
-  void el.offsetWidth;
-  el.classList.add(newVal > oldVal ? 'flash-up' : newVal < oldVal ? 'flash-down' : '');
+function flipCard(el,i){
+  if(el.classList.contains('flipped')) return;
+  el.classList.add('flipped'); flipped++;
+  if(flipped===drawn.length) setTimeout(showResult,900);
 }
-function makeSpark(id, color){
-  const ctx = document.getElementById(id).getContext('2d');
-  return new Chart(ctx, {type:'line', data:{labels:[], datasets:[{data:[], borderColor:color, backgroundColor:color+'33', fill:true, tension:.4, pointRadius:0, borderWidth:2}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:{enabled:false}}, scales:{x:{display:false}, y:{display:false}}, animation:{duration:600}}});
+function showResult(){
+  const q=document.getElementById('q').value.trim();
+  const overall=document.getElementById('overall');
+  const ups=drawn.filter(c=>!c.reversed).length;
+  let tone = ups===drawn.length ? '카드가 모두 정방향으로 나왔습니다. 흐름이 당신 편이에요. 자신 있게 나아가도 좋습니다.' :
+             ups===0 ? '카드가 모두 역방향으로 나왔습니다. 지금은 서두르기보다 돌아보고 정비하는 시간이 필요해요. 이 또한 지나갑니다.' :
+             '정방향과 역방향이 섞여 나왔습니다. 빛과 그림자가 함께 있는 시기예요. 조심할 것은 조심하고, 잡을 기회는 확실히 잡으세요.';
+  overall.innerHTML=`<h3>✦ 종합 리딩</h3><p>${tone}</p><p style="margin-top:10px">뽑힌 카드는 <b>${drawn.map(c=>c.name+'('+ (c.reversed?'역방향':'정방향') +')').join(', ')}</b>입니다. 아래 각 카드의 해석을 천천히 읽어보세요. 특히 마음에 오래 남는 문장이 있다면, 그게 당신에게 가장 필요한 메시지일 수 있어요.</p>${q?`<div class="q">당신의 질문: “${q}”</div>`:''}`;
+  const box=document.getElementById('readings'); box.innerHTML='';
+  const focus = selectedSpread==='love' ? 'love' : selectedSpread==='career' ? 'career' : selectedSpread==='money' ? 'money' : null;
+  drawn.forEach((c,i)=>{
+    const div=document.createElement('div'); div.className='reading';
+    const main = c.reversed?c.rev:c.up;
+    const love = c.reversed?c.loveR:c.loveU, career=c.reversed?c.careerR:c.careerU, money=c.reversed?c.moneyR:c.moneyU;
+    div.innerHTML=`<header><div class="r-sym">${c.sym}</div><div><h4>${spreadPos[selectedSpread][i]||''} — ${c.name} <small>${c.en} · ${String(c.n).padStart(2,'0')} · ${c.reversed?'역방향':'정방향'}</small></h4></div></header>
+    <div class="keywords">${c.kw.map(k=>`<span class="kw">#${k}</span>`).join('')}</div>
+    <div class="sec"><b>전체 해석</b><p>${main}</p></div>
+    <div class="sec"><b>💗 사랑</b><p>${love}</p></div>
+    <div class="sec"><b>💼 일 · 커리어</b><p>${career}</p></div>
+    <div class="sec"><b>💰 재물</b><p>${money}</p></div>
+    <div class="sec"><b>✦ 타로의 조언</b><p>${c.advice}</p></div>
+    <div class="lucky"><span>🍀 행운의 색: ${c.color}</span><span>🔢 행운의 숫자: ${c.num===0?22:c.num}</span><span>${c.reversed?'역방향':'정방향'}</span></div>`;
+    box.appendChild(div);
+  });
+  document.getElementById('result').classList.add('show');
+  document.getElementById('result').scrollIntoView({behavior:'smooth'});
 }
-function makeMain(){
-  const ctx = document.getElementById('main-chart').getContext('2d');
-  return new Chart(ctx, {type:'line', data:{labels:[], datasets:[
-    {label:'BTC', data:[], borderColor:'#f7931a', backgroundColor:'rgba(247,147,26,.12)', fill:true, tension:.4, pointRadius:0, borderWidth:2.5},
-    {label:'ETH', data:[], borderColor:'#a78bfa', backgroundColor:'rgba(167,139,250,.12)', fill:true, tension:.4, pointRadius:0, borderWidth:2.5}
-  ]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#e2e8f0', font:{weight:'bold'}}}}, scales:{x:{ticks:{color:'#94a3b8', maxTicksLimit:8}, grid:{color:'rgba(255,255,255,.06)'}}, y:{ticks:{color:'#94a3b8', callback:v=>'$'+Number(v).toLocaleString()}, grid:{color:'rgba(255,255,255,.06)'}}}}});
+function resetAll(keepSpread){
+  document.getElementById('deckArea').classList.remove('show');
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('cards').innerHTML='';
+  document.getElementById('shuffleBtn').textContent='🔮 카드 셔플하기';
+  if(!keepSpread) document.getElementById('q').value='';
 }
-async function fetchJSON(url){
-  const r = await fetch(url);
-  if(!r.ok) throw new Error('HTTP '+r.status);
-  return r.json();
+function copyReading(){
+  const txt=document.getElementById('result').innerText;
+  navigator.clipboard.writeText('🔮 루나 타로 리딩\n\n'+txt).then(()=>alert('리딩 결과가 복사됐어요.'));
 }
-async function fetchAll(manual){
-  const status = document.getElementById('status');
-  try{
-    const [usd, krw] = await Promise.all([
-      fetchJSON('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum&price_change_percentage=24h'),
-      fetchJSON('https://api.coingecko.com/api/v3/coins/markets?vs_currency=krw&ids=bitcoin,ethereum')
-    ]);
-    const b = usd.find(x=>x.id==='bitcoin'), e = usd.find(x=>x.id==='ethereum');
-    const bk = krw.find(x=>x.id==='bitcoin'), ek = krw.find(x=>x.id==='ethereum');
-    // BTC
-    flash(document.getElementById('btc-price'), prev.bitcoin, b.current_price);
-    document.getElementById('btc-price').textContent = fmtUSD(b.current_price);
-    document.getElementById('btc-krw').innerHTML = fmtKRW(bk.current_price) + ' <span>원</span>';
-    setBadge(document.getElementById('btc-change'), b.price_change_percentage_24h);
-    document.getElementById('btc-high').textContent = fmtUSD(b.high_24h);
-    document.getElementById('btc-low').textContent = fmtUSD(b.low_24h);
-    document.getElementById('btc-cap').textContent = fmtBig(b.market_cap);
-    document.getElementById('btc-vol').textContent = fmtBig(b.total_volume);
-    // ETH
-    flash(document.getElementById('eth-price'), prev.ethereum, e.current_price);
-    document.getElementById('eth-price').textContent = fmtUSD(e.current_price);
-    document.getElementById('eth-krw').innerHTML = fmtKRW(ek.current_price) + ' <span>원</span>';
-    setBadge(document.getElementById('eth-change'), e.price_change_percentage_24h);
-    document.getElementById('eth-high').textContent = fmtUSD(e.high_24h);
-    document.getElementById('eth-low').textContent = fmtUSD(e.low_24h);
-    document.getElementById('eth-cap').textContent = fmtBig(e.market_cap);
-    document.getElementById('eth-vol').textContent = fmtBig(e.total_volume);
-    prev.bitcoin = b.current_price; prev.ethereum = e.current_price;
-    document.getElementById('ticker').innerHTML =
-      `<span>₿ <b>BTC</b> ${fmtUSD(b.current_price)} (${b.price_change_percentage_24h.toFixed(2)}%)</span>`+
-      `<span>Ξ <b>ETH</b> ${fmtUSD(e.current_price)} (${e.price_change_percentage_24h.toFixed(2)}%)</span>`+
-      `<span>BTC/KRW <b>${fmtKRW(bk.current_price)}</b></span><span>ETH/KRW <b>${fmtKRW(ek.current_price)}</b></span>`;
-    document.getElementById('updated').textContent = new Date().toLocaleTimeString('ko-KR');
-    status.textContent = manual ? '새로고침 완료 ✓' : '실시간 연결됨 ✓  •  10초마다 자동 업데이트';
-    countdown = 10;
-    // charts (less often is fine, fetch each time but cheap for 1 day)
-    fetchCharts();
-  }catch(err){
-    console.error(err);
-    status.textContent = '시세 불러오기 실패 — 잠시 후 다시 시도합니다. (CoinGecko 속도 제한일 수 있어요)';
-  }
-}
-async function fetchCharts(){
-  try{
-    const [bc, ec] = await Promise.all([
-      fetchJSON('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1'),
-      fetchJSON('https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=1')
-    ]);
-    const labels = bc.prices.map(p=>new Date(p[0]).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}));
-    const bData = bc.prices.map(p=>p[1]), eData = ec.prices.map(p=>p[1]);
-    if(!btcChart) btcChart = makeSpark('btc-chart','#f7931a');
-    if(!ethChart) ethChart = makeSpark('eth-chart','#627eea');
-    if(!mainChart) mainChart = makeMain();
-    btcChart.data.labels = labels; btcChart.data.datasets[0].data = bData; btcChart.update();
-    ethChart.data.labels = labels; ethChart.data.datasets[0].data = eData; ethChart.update();
-    mainChart.data.labels = labels; mainChart.data.datasets[0].data = bData; mainChart.data.datasets[1].data = eData; mainChart.update();
-  }catch(e){ console.warn('chart failed', e); }
-}
-function toggleAuto(){
-  auto = !auto;
-  document.getElementById('auto-btn').textContent = auto ? '⏸ 자동 업데이트 끄기' : '▶ 자동 업데이트 켜기';
-  document.getElementById('status').textContent = auto ? '자동 업데이트 켜짐' : '자동 업데이트 꺼짐 — 새로고침 버튼을 눌러주세요';
-}
-fetchAll(false);
-timer = setInterval(()=>{
-  if(!auto) return;
-  countdown--;
-  document.getElementById('countdown').textContent = countdown + '초';
-  if(countdown <= 0){ countdown = 10; fetchAll(false); }
-}, 1000);
+// stars
+(function(){
+  const c=document.getElementById('stars'), ctx=c.getContext('2d');
+  function resize(){c.width=innerWidth;c.height=innerHeight}
+  resize(); addEventListener('resize',resize);
+  const stars=Array.from({length:140},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.6+.3,s:Math.random()*.5+.1}));
+  (function loop(){ctx.clearRect(0,0,c.width,c.height); stars.forEach(s=>{s.y+=s.s; if(s.y>innerHeight)s.y=0; ctx.globalAlpha=.4+Math.random()*.6; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,7); ctx.fill();}); requestAnimationFrame(loop);})();
+})();
 </script>
 </body>
 </html>
